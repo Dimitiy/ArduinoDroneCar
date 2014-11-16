@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <style name="TransparentAppTheme" parent="Theme.AppCompat.Light">
+    </style>
+ 
+ 
+    <style name="TransparentAppTheme.TranslucentActionBar">
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
+        <item name="actionBarStyle">@style/TranslucentActionBar</item>
+    </style>
+</resources>

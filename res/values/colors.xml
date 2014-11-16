@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="actionbar_background_location">#3b78e7</color>
+    <color name="actionbar_background_sensors">#fb8521</color>
+    <color name="actionbar_background">#689f38</color>
+    <color name="navigation_image_background">#009688</color>
+    <color name="bases_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="navigation_background">#fafafa</color>
+    <color name="black">#616161</color>
+    <color name="white">#fff</color>
+    <color name="password_background">#354721</color>
+    <color name="theme_accent_color">#FF339999</color>
+    <color name="theme_accent_color_light">#44339999</color>
+    <color name="background_color">#F000</color>
+    <color name="marker_color">#FFFF</color>
+    <color name="shadow_color">#7AAA</color>
+    <color name="outer_border">#FF444444</color>
+    <color name="inner_border_one">#FF323232</color>
+    <color name="inner_border_two">#FF414141</color>
+    <color name="inner_border">#FFFFFFFF</color>
+    <color name="horizon_sky_from">#FFA52A2A</color>
+    <color name="horizon_sky_to">#FFFFC125</color>
+    <color name="horizon_ground_from">#FF5F9EA0</color>
+    <color name="horizon_ground_to">#FF00008B</color>
+    <color name="text_color">#FFFF</color>
+
+</resources>

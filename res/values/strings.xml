@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DroneCar</string>
+
+    <string-array name="screen_array">
+        <item>Поиск устройства</item>
+        <item>Местоположение</item>
+        <item>Датчики</item>
+    </string-array>
+
+    <integer-array name="nav_drawer_icons">
+        <item>@drawable/ic_airplane</item>
+        <item>@drawable/ic_map</item>
+        <item>@drawable/ic_sensors</item>
+    </integer-array>
+
+    <string name="info_text">Наклоните Android устройство вперед или назад для начала движения робота</string>
+    <string name="title_section1">Поиск устройства</string>
+    <string name="title_section2">Местоположение</string>
+    <string name="title_section3">Датчики</string>
+    <string name="tab_connect">Подключение</string>
+    <string name="tab_stat">Статистика</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example">Example action</string>
+    <string name="action_settings">Settings</string>
+    <string name="option_one">Test option 1</string>
+    <string name="option_two">Test option 2</string>
+    <string name="option_three">Test option 3</string>
+    <string name="operator">Оператор:</string>
+    <string name="operator_name">Иванов Иван</string>
+    <string name="error_password">Неправильный пароль! Попробуйте еще раз!</string>
+    <string name="search_drone">Поиск устройства</string>
+    <string name="location">Местоположение</string>
+    <string name="sensors">Датчики</string>
+    <string name="about">О программе</string>
+    <string name="enter_password">Введите пароль:</string>
+    <string name="action_search">Поиск</string>
+    <string name="action_about">О программе</string>
+    <string name="design">Разработка 46 отдела ВИ(НИ)</string>
+    <string name="vka">ВКА им. А.Ф.Можайского</string>
+    <string name="forward">forward</string>
+    <string name="backward">backward</string>
+    <string name="left">left</string>
+    <string name="right">right</string>
+    <string name="default_commandLeft">L</string>
+    <string name="default_commandRight">R</string>
+    <string name="default_commandHorn">H</string>
+    <string name="default_pwmBtnMotorLeft">255</string>
+    <string name="default_pwmBtnMotorRight">255</string>
+    <string name="connect">Подключиться к пункту управления</string>
+    <string name="disconnect">Отключиться от пункта управления</string>
+    <string name="connect_motion_base">Подключиться к двигателям установки</string>
+    <string name="disconnect_motion_base">Отключиться от двигателей установки</string>
+    <string name="input_ip">Введите ip адрес и порт ПУ</string>
+    <string name="cardinal_north">Север</string>
+    <string name="cardinal_east">Восток</string>
+    <string name="cardinal_south">Юг</string>
+    <string name="cardinal_west">Запад</string>
+    <string name="calibration">Калибровка датчиков</string>
+    <string name="clear_calibration">Сбросить калибровку</string>
+    <string name="default_xR">5</string>
+    <string name="default_xMax">7</string>
+    <string name="default_yMax">5</string>
+    <string name="default_yThreshold">50</string>
+    <string name="default_xRperc">60</string>
+    <string name="default_pwmMax">255</string>
+    <string name="handle_control">Перейти к управлению устройством</string>
+    <string name="check_state_usb">Проверить соединение с двигателями</string>
+    <string name="mode_observer">Перейти в режим "наблюдателя"</string>
+
+</resources>

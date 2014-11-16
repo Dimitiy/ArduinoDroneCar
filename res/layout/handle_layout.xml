@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true" 
+    android:background="@color/material_blue_grey_800">
+
+    <include layout="@layout/toolbar" />
+
+     <ToggleButton
+        android:id="@+id/LightButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textViewCmdSend"
+        android:layout_centerHorizontal="true" />
+
+     <TextView
+         android:id="@+id/textViewCmdSend"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentBottom="true"
+         android:layout_alignParentLeft="true" />
+
+     <TextView
+         android:id="@+id/textViewY"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_above="@+id/textViewCmdSend"
+         android:layout_alignParentLeft="true" />
+
+     <TextView
+         android:id="@+id/textViewX"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_above="@+id/textViewY"
+         android:layout_alignParentLeft="true" />
+
+</RelativeLayout>
