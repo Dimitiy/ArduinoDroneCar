@@ -69,5 +69,6 @@
     <string name="handle_control">Перейти к управлению устройством</string>
     <string name="check_state_usb">Проверить соединение с двигателями</string>
     <string name="mode_observer">Перейти в режим "наблюдателя"</string>
+    <string name="purpose">Программый комплекс управления и мониторинга беспилотным устройством</string>
 
 </resources>

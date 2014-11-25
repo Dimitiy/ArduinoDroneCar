@@ -17,15 +17,13 @@ import android.graphics.Shader.TileMode;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.android.util.Logging;
 import com.shiz.arduinodronecar.R;
-
-
 
 public class CompassView extends View {
 	private enum CompassDirection {
-		N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW, NW, NNW
+		Ñ, ÑÑÂ, ÑÂ, ÂÑÂ, Â, ÂÞÂ, ÞÂ, ÞÞÂ, Þ, ÞÞÇ, ÞÇ, ÇÞÇ, Ç, ÇÑÇ, ÑÇ, ÑÑÇ
 	}
-
 	int[] borderGradientColors;
 	float[] borderGradientPositions;
 
@@ -45,6 +43,7 @@ public class CompassView extends View {
 	private float bearing;
 	float pitch = 0;
 	float roll = 0;
+	private Resources r;
 
 	public void setBearing(float _bearing) {
 		bearing = _bearing;
@@ -88,7 +87,7 @@ public class CompassView extends View {
 	protected void initCompassView() {
 		setFocusable(true);
 		// Get external resources
-		Resources r = this.getResources();
+		r = this.getResources();
 
 		circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		circlePaint.setColor(R.color.background_color);
@@ -97,8 +96,8 @@ public class CompassView extends View {
 
 		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		textPaint.setColor(r.getColor(R.color.text_color));
-		textPaint.setTextSize( 30 );
-	     
+		textPaint.setTextSize(30);
+
 		textPaint.setFakeBoldText(true);
 		textPaint.setSubpixelText(true);
 		textPaint.setTextAlign(Align.LEFT);
@@ -118,7 +117,7 @@ public class CompassView extends View {
 		borderGradientColors[3] = r.getColor(R.color.outer_border);
 		borderGradientColors[2] = r.getColor(R.color.inner_border_one);
 		borderGradientColors[1] = r.getColor(R.color.inner_border_two);
-		borderGradientColors[0] = r.getColor(R.color.inner_border);
+		borderGradientColors[0] = r.getColor(R.color.inner_border_one);
 		borderGradientPositions[3] = 0.0f;
 		borderGradientPositions[2] = 1 - 0.03f;
 		borderGradientPositions[1] = 1 - 0.06f;
@@ -170,7 +169,6 @@ public class CompassView extends View {
 		// Decode the measurement specifications.
 		int specMode = MeasureSpec.getMode(measureSpec);
 		int specSize = MeasureSpec.getSize(measureSpec);
-
 		if (specMode == MeasureSpec.UNSPECIFIED) {
 			// Return a default size of 200 if no bounds are specified.
 			result = 200;
@@ -184,7 +182,7 @@ public class CompassView extends View {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		float ringWidth = textHeight + 6;
+		float ringWidth = textHeight + 3;
 		int height = getMeasuredHeight();
 		int width = getMeasuredWidth();
 
@@ -203,7 +201,7 @@ public class CompassView extends View {
 
 		float innerRadius = innerBoundingBox.height() / 2;
 		RadialGradient borderGradient = new RadialGradient(px, py, radius,
-				borderGradientColors, borderGradientPositions, TileMode.CLAMP);
+				borderGradientColors, borderGradientPositions, TileMode.MIRROR);
 
 		Paint pgb = new Paint();
 		pgb.setShader(borderGradient);
@@ -251,7 +249,7 @@ public class CompassView extends View {
 		int endX = center.x + markWidth;
 
 		double h = innerRadius * Math.cos(Math.toRadians(90 - tiltDegree));
-		double justTiltY = center.y - h;
+		float justTiltY = (float) (center.y - h);
 
 		float pxPerDegree = (innerBoundingBox.height() / 2) / 45f;
 		for (int i = 90; i >= -90; i -= 10) {
@@ -271,24 +269,30 @@ public class CompassView extends View {
 			canvas.drawText(displayString,
 					(int) (center.x - stringSizeWidth / 2), (int) (ypos) + 1,
 					textPaint);
+			markerPaint.setStrokeWidth(6);
+			if (justTiltY < 500)
+				canvas.drawLine(center.x - justTiltY, (float) justTiltY,
+						center.x + justTiltY, (float) justTiltY, markerPaint);
+			else
+				canvas.drawLine(center.x - (1000 - justTiltY)   , (float) justTiltY,
+						center.x + (1000 - justTiltY), (float) justTiltY, markerPaint);
+			markerPaint.setStrokeWidth(1);
 		}
-		markerPaint.setStrokeWidth(2);
-		canvas.drawLine(center.x - radius / 2, (float) justTiltY, center.x
-				+ radius / 2, (float) justTiltY, markerPaint);
-		markerPaint.setStrokeWidth(1);
 
 		// Draw the arrow
 		Path rollArrow = new Path();
-		rollArrow.moveTo(center.x - 3, (int) innerBoundingBox.top + 14);
-		rollArrow.lineTo(center.x, (int) innerBoundingBox.top + 10);
-		rollArrow.moveTo(center.x + 3, innerBoundingBox.top + 14);
-		rollArrow.lineTo(center.x, innerBoundingBox.top + 10);
+		markerPaint.setStrokeWidth(4);
+		rollArrow.moveTo(center.x - 20, (int) innerBoundingBox.top + 50);
+		rollArrow.lineTo(center.x, (int) innerBoundingBox.top + 28);
+		rollArrow.moveTo(center.x + 20, innerBoundingBox.top + 50);
+		rollArrow.lineTo(center.x, innerBoundingBox.top + 28);
 		canvas.drawPath(rollArrow, markerPaint);
+		markerPaint.setStrokeWidth(1);
 		// Draw the string
 		String rollText = String.valueOf(rollDegree);
 		double rollTextWidth = textPaint.measureText(rollText);
 		canvas.drawText(rollText, (float) (center.x - rollTextWidth / 2),
-				innerBoundingBox.top + textHeight + 2, textPaint);
+				innerBoundingBox.top + textHeight + 50, textPaint);
 		canvas.restore();
 
 		canvas.save();
@@ -302,11 +306,56 @@ public class CompassView extends View {
 						/ 2, innerBoundingBox.top + 1 + textHeight);
 				canvas.drawText(rollString, rollStringCenter.x,
 						rollStringCenter.y, textPaint);
+				if (i == 0) {
+
+					Path path = new Path();
+					// î÷èñòêà path
+					path.reset();
+					markerPaint.setStrokeWidth(10);
+					markerPaint.setColor(r
+							.getColor(R.color.actionbar_background_sensors));
+
+					// airplane
+					path.moveTo(width / 4, (float) py);
+					path.lineTo((width - 60) / 2, (float) py);
+					path.addCircle(px, (float) py, 30, Path.Direction.CW);
+					path.moveTo((width + 60) / 2, (float) py);
+					path.lineTo(3 * width / 4, (float) py);
+					path.moveTo(px, (float) py - 26);
+					path.lineTo(px, (float) py - 80);
+					// markerPaint);
+					canvas.drawPath(path, markerPaint);
+					// path airplane
+					markerPaint.setColor(r.getColor(R.color.marker_color));
+					markerPaint.setStrokeWidth(3);
+					// float[] intervals = new float[] { 60.0f, 10.0f };
+					// float phase = 0;
+					// DashPathEffect mDashPathEffect = new
+					// DashPathEffect(intervals, phase);
+					// markerPaint.setPathEffect(mDashPathEffect);
+					path.reset();
+					// one line
+					path.moveTo(width / 4, (float) 3 * py / 2 + 50);
+					path.lineTo(px, (float) py);
+					path.moveTo(3 * width / 4, (float) 3 * py / 2 + +50);
+					path.lineTo(px, (float) py);
+					// two line
+					path.moveTo(width / 8, (float) 5 * py / 4);
+					path.lineTo(px, (float) py);
+					path.moveTo(7 * width / 8, (float) 5 * py / 4);
+					path.lineTo(px, (float) py);
+					canvas.drawPath(path, markerPaint);
+					path.reset();
+					markerPaint.setStrokeWidth(1);
+					// markerPaint.setColor(r.getColor(R.color.marker_color));
+					// markerPaint.setPathEffect(null);
+				}
 			}
 			// Otherwise draw a marker line
 			else {
 				canvas.drawLine(center.x, (int) innerBoundingBox.top, center.x,
 						(int) innerBoundingBox.top + 5, markerPaint);
+
 			}
 
 			canvas.rotate(10, center.x, center.y);
@@ -336,7 +385,7 @@ public class CompassView extends View {
 			canvas.rotate((int) increment, center.x, center.y);
 		}
 		canvas.restore();
-		RadialGradient glassShader = new RadialGradient(px, py,
+		RadialGradient glassShader = new RadialGradient(center.x, center.y,
 				(int) innerRadius, glassGradientColors, glassGradientPositions,
 				TileMode.CLAMP);
 		Paint glassPaint = new Paint();

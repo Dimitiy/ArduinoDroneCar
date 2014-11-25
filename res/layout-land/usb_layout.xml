@@ -4,65 +4,67 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollView1"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:adjustViewBounds="true"
-        android:divider="@drawable/separator"
-        android:dividerPadding="3dp"
-        android:orientation="horizontal"
-        android:showDividers="middle" >
+        android:layout_height="wrap_content" >
 
-        <ToggleButton
-            android:id="@+id/toggleConnectControlPoint"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textColor="@drawable/list_selector_toggle"
-            android:textOff="@string/connect"
-            android:textOn="@string/disconnect"
-            android:textSize="16sp" />
-    </LinearLayout>
+            android:orientation="vertical" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@drawable/separator"
-        android:dividerPadding="3dp"
-         android:showDividers="middle"
-        android:gravity="center_horizontal"
-        android:orientation="vertical" >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:adjustViewBounds="true"
+                android:divider="@drawable/separator"
+                android:dividerPadding="3dp"
+                android:orientation="horizontal"
+                android:showDividers="middle" >
 
-        <Button
-            android:id="@+id/button_handle"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@drawable/button_selector_search_fragment"
-            android:text="@string/handle_control"
-            android:textColor="@drawable/button_text_selector" />
+                <ToggleButton
+                    android:id="@+id/toggleConnectControlPoint"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textColor="@drawable/list_selector_toggle"
+                    android:textOff="@string/connect"
+                    android:textOn="@string/disconnect"
+                    android:textSize="16sp" />
+            </LinearLayout>
 
-         <Button
-            android:id="@+id/button_observer"
-            android:layout_marginTop="3dp"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@drawable/button_selector_search_fragment"
-            android:text="@string/mode_observer"
-            android:textColor="@drawable/button_text_selector" />
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                android:adjustViewBounds="true"
+                android:divider="@drawable/separator"
+                android:dividerPadding="3dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:showDividers="middle" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"
-        android:orientation="vertical" >
+                <Button
+                    android:id="@+id/button_handle"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@drawable/button_selector_search_fragment"
+                    android:text="@string/handle_control"
+                    android:textColor="@drawable/button_text_selector"
+                    android:textSize="16sp" />
 
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="318dp"
-            android:layout_height="264dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/vko" />
-    </RelativeLayout>
+                <Button
+                    android:id="@+id/button_observer"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/button_selector_search_fragment"
+                    android:text="@string/mode_observer"
+                    android:textColor="@drawable/button_text_selector"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

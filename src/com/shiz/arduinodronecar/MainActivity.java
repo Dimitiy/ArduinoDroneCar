@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.shiz.arduinodronecar.connect.SocketService;
 import com.shiz.arduinodronecar.fragment.LocationFragment;
 import com.shiz.arduinodronecar.fragment.SearchDroneFragment;
 import com.shiz.arduinodronecar.fragment.SensorFragment;
@@ -155,7 +156,11 @@ public class MainActivity extends ActionBarActivity implements
 					.commit();
 			restoreActionBar();
 		} else {
+			SocketService.closeConnect();
+			stopService(new Intent(this, SocketService.class));
+
 			super.onBackPressed();
+			
 		}
 	}
 
@@ -278,5 +283,6 @@ public class MainActivity extends ActionBarActivity implements
 
 		return super.onOptionsItemSelected(item);
 	}
+
 
 }

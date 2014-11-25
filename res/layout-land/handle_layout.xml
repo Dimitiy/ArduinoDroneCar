@@ -1,29 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/material_blue_grey_800"
-    android:keepScreenOn="true"
-    android:orientation="vertical" >
+    android:keepScreenOn="true" xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <include layout="@layout/toolbar" />
-
+   
+    <ru.yandex.yandexmapkit.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:apiKey="OTENyNoLbWXvXL~RbI3BGE0qTESOwyRqgRPPTPmoRX0nmQVWbnbTGnYWEm3qocJHZ7Yl73ufiNhDwLzHOj7rDD3XgQzUfW~D6VIhTPLEO1s=" >
+    </ru.yandex.yandexmapkit.MapView>
+     <include layout="@layout/toolbar_transparent" />
+    
     <LinearLayout
-        android:layout_width="260dp"
-        android:layout_height="198dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
         android:orientation="horizontal" >
 
-        <com.shiz.arduinodronecar.data.CompassView
-            android:id="@+id/compassView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="3dp" />
+       <com.shiz.arduinodronecar.data.CompassView
+           android:id="@+id/compassView"
+           android:layout_width="162dp"
+           android:layout_height="254dp"
+           android:layout_margin="3dp" />
+
     </LinearLayout>
 
     <RelativeLayout
-        android:layout_width="254dp"
-        android:layout_height="wrap_content"
+        android:layout_width="165dp"
+        android:layout_height="42dp"
         android:layout_gravity="bottom" >
 
         <ToggleButton
@@ -55,4 +62,4 @@
             android:layout_alignParentLeft="true" />
     </RelativeLayout>
 
-</LinearLayout>
+</FrameLayout>

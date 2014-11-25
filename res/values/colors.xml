@@ -20,10 +20,11 @@
     <color name="inner_border_one">#FF323232</color>
     <color name="inner_border_two">#FF414141</color>
     <color name="inner_border">#FFFFFFFF</color>
-    <color name="horizon_sky_from">#FFA52A2A</color>
-    <color name="horizon_sky_to">#FFFFC125</color>
+    <color name="horizon_sky_from">#795548</color>
+    <color name="horizon_sky_to">#7D441D</color>
     <color name="horizon_ground_from">#FF5F9EA0</color>
     <color name="horizon_ground_to">#FF00008B</color>
     <color name="text_color">#FFFF</color>
+    <color name="path_color">#FF9800</color>
 
 </resources>

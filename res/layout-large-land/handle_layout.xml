@@ -1,31 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/material_blue_grey_800"
-    android:keepScreenOn="true"
-    android:orientation="vertical" >
+    android:keepScreenOn="true" >
 
-    <include layout="@layout/toolbar" />
+    <ru.yandex.yandexmapkit.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:apiKey="OTENyNoLbWXvXL~RbI3BGE0qTESOwyRqgRPPTPmoRX0nmQVWbnbTGnYWEm3qocJHZ7Yl73ufiNhDwLzHOj7rDD3XgQzUfW~D6VIhTPLEO1s=" >
+    </ru.yandex.yandexmapkit.MapView>
+
+    <include layout="@layout/toolbar_transparent" />
 
     <LinearLayout
-        android:layout_width="397dp"
-        android:layout_height="336dp"
-        android:orientation="vertical" >
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:orientation="horizontal" >
+
         <com.shiz.arduinodronecar.data.CompassView
             android:id="@+id/compassView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
             android:layout_margin="3dp" />
-       
-  
-   </LinearLayout>
+    </LinearLayout>
 
     <RelativeLayout
-        android:layout_width="254dp"
-        android:layout_height="wrap_content"
+        android:layout_width="165dp"
+        android:layout_height="42dp"
         android:layout_gravity="bottom" >
+
+        <ToggleButton
+            android:id="@+id/LightButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true" />
 
         <TextView
             android:id="@+id/textViewCmdSend"
@@ -47,14 +60,6 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/textViewY"
             android:layout_alignParentLeft="true" />
-
-        <ToggleButton
-            android:id="@+id/LightButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="23dp"
-            android:layout_toRightOf="@+id/textViewCmdSend" />
     </RelativeLayout>
 
-</LinearLayout>
+</FrameLayout>
