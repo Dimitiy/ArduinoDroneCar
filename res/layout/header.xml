@@ -33,6 +33,7 @@
 
         <TextView
             android:id="@+id/operator_n"
+            style="@style/Theme.MyAppTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"

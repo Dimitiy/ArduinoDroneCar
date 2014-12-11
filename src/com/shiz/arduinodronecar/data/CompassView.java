@@ -17,7 +17,6 @@ import android.graphics.Shader.TileMode;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.android.util.Logging;
 import com.shiz.arduinodronecar.R;
 
 public class CompassView extends View {
@@ -96,7 +95,7 @@ public class CompassView extends View {
 
 		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		textPaint.setColor(r.getColor(R.color.text_color));
-		textPaint.setTextSize(30);
+		textPaint.setTextSize(r.getDimension(R.dimen.text_size_compass));
 
 		textPaint.setFakeBoldText(true);
 		textPaint.setSubpixelText(true);

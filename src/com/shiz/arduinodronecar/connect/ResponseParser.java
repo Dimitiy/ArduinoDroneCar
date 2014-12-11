@@ -4,15 +4,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.util.Logging;
-
-import android.util.Log;
+import com.shiz.arduinodronecar.data.MapsViewController;
 
 public class ResponseParser {
 	String device, type, data;
 	private String TAG = ResponseParser.class.getSimpleName();
+
 	public void Parser(String response) {
-		Logging.doLog(TAG,
-				"response " + response, 	"response " + response);
+		Logging.doLog(TAG, "response " + response, "response " + response);
 
 		JSONObject jsonObject;
 		try {
@@ -58,6 +57,31 @@ public class ResponseParser {
 		} else {
 			setData(null);
 		}
+		// ----------location------------
+		try {
+			str = jsonObject.getString("loc");
+		} catch (JSONException e) {
+			str = null;
+		}
+		if (str != null) {
+			setLocation(str);
+
+		} else {
+//			setLocation(null);
+		}
+	}
+
+	private void setLocation(String str) {
+		// TODO Auto-generated method stub
+		LocationToServerListener lToServer = new LocationToServerListener() {
+			
+			@Override
+			public void changeLocation(Double x, Double y) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+		
 	}
 
 	public void setDevice(String device) {

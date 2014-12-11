@@ -22,14 +22,15 @@ import android.widget.Toast;
 import com.android.util.Logging;
 
 public class SocketService extends Service {
-	String address = "0.0.0.0";
+	private String address = "0.0.0.0";
 	static Socket socket;
 	private static Context mContext;
-	public final static String TAG = SocketService.class.getSimpleName();
+	private final static String TAG = SocketService.class.getSimpleName();
 	private SharedPreferences sPref;
-	static DataOutputStream out;
-	DataInputStream in;
-	static JsonBuilder jsonBuilder;
+	private static DataOutputStream out;
+	private DataInputStream in;
+	private static JsonBuilder jsonBuilder;
+	private static boolean isConnect = false;
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
@@ -76,6 +77,7 @@ public class SocketService extends Service {
 														// порт сервера.
 			Logging.doLog(TAG, "Yes! I just got hold of the program.",
 					"Yes! I just got hold of the program.");
+			setConnect(true);
 			Handler handler = new Handler(Looper.getMainLooper());
 			handler.post(new Runnable() {
 				public void run() {
@@ -145,7 +147,7 @@ public class SocketService extends Service {
 			x.printStackTrace();
 		}
 	}
-
+	
 	public static void sendToServerComand(String line) {
 		try {
 			String commandType = "1";
@@ -177,6 +179,8 @@ public class SocketService extends Service {
 		try {
 			if (socket != null) {
 				socket.close();
+				setConnect(false);
+				
 			} else
 				Logging.doLog(TAG, "nullSocket", "nullSocket");
 		} catch (IOException e) {
@@ -205,7 +209,12 @@ public class SocketService extends Service {
 
 		}
 	}
-
+	private static void setConnect(boolean setConnect){
+		isConnect = setConnect;
+	}
+	public static boolean isConnect(){
+		return isConnect;
+	}
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
@@ -221,6 +230,8 @@ public class SocketService extends Service {
 		super.onDestroy();
 		try {
 			socket.close();
+			setConnect(false);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

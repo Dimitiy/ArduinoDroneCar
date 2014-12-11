@@ -1,35 +1,45 @@
 package com.shiz.arduinodronecar;
 
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.app.ActionBar.LayoutParams;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.Window;
+import android.view.WindowManager;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.android.util.Logging;
 import com.shiz.arduinodronecar.connect.SocketService;
+import com.shiz.arduinodronecar.data.MapsViewController;
 
 public class HandleDroneActivity extends ActionBarActivity implements
-		SensorEventListener {
+		SensorEventListener, OnCheckedChangeListener {
 	private final String TAG = HandleDroneActivity.class.getSimpleName();
 	private SensorManager mSensorManager;
-	private Sensor mAccel;
-	private ToggleButton lightButton;
+	// private Sensor mAccel;
+	private android.support.v7.widget.SwitchCompat handleButton;
 
 	private int xAxis = 0;
 	private int yAxis = 0;
@@ -45,12 +55,15 @@ public class HandleDroneActivity extends ActionBarActivity implements
 	private ServiceConnection mConnection;
 	private SocketService mBoundService;
 	private boolean mIsBound = false;
-	
-	private String FORWARD_COMMAND = "1"; 
+
+	private String FORWARD_COMMAND = "1";
 	private String LEFT_COMMAND = "2";
 	private String RIGHT_COMMAND = "3";
 	private String BACKWARD_COMMAND = "4";
 	private String STOP_COMMAND = "0";
+	final private int DIALOG_SWITCH = 1;
+	final private int DIALOG_HANDLE = 2;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -58,6 +71,8 @@ public class HandleDroneActivity extends ActionBarActivity implements
 		supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
 		setContentView(R.layout.handle_layout);
+		MapsViewController mMap = new MapsViewController(this);
+		mMap.init();
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
@@ -74,22 +89,9 @@ public class HandleDroneActivity extends ActionBarActivity implements
 		pwmMax = Integer.parseInt((String) getResources().getText(
 				R.string.default_pwmMax));
 
-		lightButton = (ToggleButton) findViewById(R.id.LightButton);
-		lightButton.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				if (lightButton.isChecked()) {
-					Log.d("isChecked", "try");
-					mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-					mAccel = mSensorManager
-							.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-					mSensorManager.registerListener(HandleDroneActivity.this,
-							mAccel, SensorManager.SENSOR_DELAY_NORMAL);
-				} else {
-					Logging.doLog("isChecked", "false", "false");
-					mSensorManager.unregisterListener(HandleDroneActivity.this);
-				}
-			}
-		});
+		createDialog(DIALOG_SWITCH);
+
+		// relativeLayout.addView(v);
 		mConnection = new ServiceConnection() {
 			// EDITED PART
 			@Override
@@ -112,15 +114,43 @@ public class HandleDroneActivity extends ActionBarActivity implements
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Only show items in the action bar relevant to this screen
+		// if the drawer is not showing. Otherwise, let the drawer
+		// decide what to show in the action bar.
+		Log.d(TAG, "onCreateOptionsMenu");
+		MenuInflater inflater = new MenuInflater(this);
+		inflater.inflate(R.menu.handle_menu, menu);
+		final MenuItem toggleservice = menu.findItem(R.id.myswitch);
+		handleButton = (android.support.v7.widget.SwitchCompat) toggleservice
+				.getActionView();
+
+		if (handleButton != null) {
+			handleButton.setOnCheckedChangeListener(this);
+		}
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			// app icon in action bar clicked; goto parent activity.
 			this.finish();
 			return true;
+		case R.id.myswitch:
+		case R.id.action_about:
+			createDialog(DIALOG_HANDLE);
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+		// handleButton.setChecked(SocketService.isConnect());
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	public void onSensorChanged(SensorEvent e) {
@@ -144,27 +174,27 @@ public class HandleDroneActivity extends ActionBarActivity implements
 			// usbConnect.motionLeft();
 			log = "left";
 			Logging.doLog(TAG, "left");
-			
+
 			SocketService.sendToServerComand(LEFT_COMMAND);
 
 		} else if (xAxis > -50 && yAxis > 140) {
 			// usbConnect.motionForward();
 			log = "forward";
 			Logging.doLog(TAG, "forward");
-			
+
 			SocketService.sendToServerComand(FORWARD_COMMAND);
 
 		} else if (xAxis > -50 && yAxis < -27) {
 			// usbConnect.motionBackward();
 			Logging.doLog(TAG, "back");
-			
+
 			log = "backward";
 			SocketService.sendToServerComand(BACKWARD_COMMAND);
 
 		} else {
 			// usbConnect.stopMotion();
 			Logging.doLog(TAG, "stop");
-			
+
 			log = "stop";
 			SocketService.sendToServerComand(STOP_COMMAND);
 
@@ -189,6 +219,36 @@ public class HandleDroneActivity extends ActionBarActivity implements
 
 	}
 
+	private void createDialog(int format) {
+		final Dialog dialog = new Dialog(this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		if (format == 1)
+			dialog.setContentView(R.layout.dialog);
+		else if (format == 2)
+			dialog.setContentView(R.layout.dialog_handle);
+		dialog.getWindow().setBackgroundDrawable(
+				new ColorDrawable(getResources().getColor(
+						R.color.black_transparent)));
+		dialog.setCanceledOnTouchOutside(true);
+
+		Window window = dialog.getWindow();
+		WindowManager.LayoutParams wlp = window.getAttributes();
+		window.getDecorView().getRootView()
+				.setOnTouchListener(new OnTouchListener() {
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+						dialog.dismiss();
+						return false;
+					}
+				});
+		wlp.gravity = Gravity.CENTER;
+		wlp.flags &= ~WindowManager.LayoutParams.FLAG_BLUR_BEHIND;
+		window.setAttributes(wlp);
+		dialog.getWindow().setLayout(LayoutParams.FILL_PARENT,
+				LayoutParams.MATCH_PARENT);
+		dialog.show();
+	}
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -198,8 +258,10 @@ public class HandleDroneActivity extends ActionBarActivity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
-//		startService(new Intent(HandleDroneActivity.this, SocketService.class));
+		// startService(new Intent(HandleDroneActivity.this,
+		// SocketService.class));
 		doBindService();
+		invalidateOptionsMenu(); // If you are using activity
 		// mAccel = mSensorManager
 		// .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		//
@@ -223,17 +285,6 @@ public class HandleDroneActivity extends ActionBarActivity implements
 		// TODO Auto-generated method stub
 	}
 
-	// @Override
-	// public boolean onCreateOptionsMenu(Menu menu) {
-	// // Only show items in the action bar relevant to this screen
-	// // if the drawer is not showing. Otherwise, let the drawer
-	// // decide what to show in the action bar.
-	// Log.d(TAG, "onCreateOptionsMenu");
-	// MenuInflater inflater = new MenuInflater(this);
-	// inflater.inflate(R.menu.toolbar_menu, menu);
-	//
-	// return super.onCreateOptionsMenu(menu);
-	// }
 	private void doBindService() {
 		bindService(new Intent(this, SocketService.class), mConnection,
 				Context.BIND_AUTO_CREATE);
@@ -250,4 +301,23 @@ public class HandleDroneActivity extends ActionBarActivity implements
 			mIsBound = false;
 		}
 	}
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		// TODO Auto-generated method stub
+		if (isChecked == true) {
+			Logging.doLog(TAG, "isChecked try", "isChecked try");
+
+			// mSensorManager = (SensorManager)
+			// getSystemService(Context.SENSOR_SERVICE);
+			// mAccel =
+			// mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+			// mSensorManager.registerListener(HandleDroneActivity.this, mAccel,
+			// SensorManager.SENSOR_DELAY_NORMAL);
+		} else {
+			Logging.doLog(TAG, "isChecked false", "isChecked false");
+			mSensorManager.unregisterListener(HandleDroneActivity.this);
+		}
+	}
+
 }

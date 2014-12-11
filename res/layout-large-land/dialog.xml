@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignBottom="@+id/left_handle"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/left_handle"
+        android:background="@android:color/transparent"
+        android:orientation="vertical"
+        android:theme="@style/Base.TextAppearance.AppCompat.Widget.PopupMenu.Large" >
+
+        <com.shiz.arduinodronecar.data.DialogView
+            android:id="@+id/vDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+<TextView
+    android:id="@+id/handle_forward"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignLeft="@+id/left_handle"
+    android:layout_alignParentBottom="true"
+    android:layout_marginBottom="44dp"
+    android:text="@string/close_dismiss"
+    android:textSize="@dimen/abc_text_size_menu_material" />
+
+<TextView
+    android:id="@+id/left_handle"
+    android:layout_width="500dp"
+    android:layout_height="wrap_content"
+    android:layout_above="@+id/handle_forward"
+    android:layout_alignParentLeft="true"
+    android:layout_marginBottom="48dp"
+    android:layout_marginLeft="53dp"
+    android:gravity="center_vertical|center_horizontal"
+    android:text="@string/dialog_send_datd"
+    android:textSize="@dimen/abc_text_size_title_material"
+    android:theme="@style/Base.TextAppearance.AppCompat.Widget.PopupMenu.Large"
+    android:typeface="monospace" />
+
+</RelativeLayout>

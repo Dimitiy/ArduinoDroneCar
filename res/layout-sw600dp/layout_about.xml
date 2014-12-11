@@ -5,20 +5,31 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <include layout="@layout/toolbar" />
+    <include layout="@layout/toolbar_transparent" />
 
     <ImageView
         android:id="@+id/imageView1"
-        android:layout_width="200dp"
-        android:layout_height="319dp"
-        android:layout_gravity="center_horizontal"
+        android:layout_width="500dp"
+        android:layout_height="500dp"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_marginTop="100dp"
+        android:layout_weight="3.88"
         android:src="@drawable/vka" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="31dp"
         android:gravity="center_horizontal"
         android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/purpose"
+            android:textColor="#000"
+            android:textSize="@dimen/abc_text_size_large_material" />
 
         <TextView
             android:id="@+id/left_handle"
@@ -28,15 +39,15 @@
             android:layout_centerHorizontal="true"
             android:text="@string/design"
             android:textColor="@color/bases_text"
-            android:textSize="18sp" />
+            android:textSize="@dimen/abc_text_size_large_material" />
 
         <TextView
             android:id="@+id/handle_forward"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/vka"
-            android:textColor="@color/bases_text" />
-
+            android:textColor="@color/bases_text"
+            android:textSize="@dimen/abc_text_size_large_material" />
     </LinearLayout>
 
 </LinearLayout>

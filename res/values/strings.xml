@@ -24,7 +24,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Настройки</string>
     <string name="option_one">Test option 1</string>
     <string name="option_two">Test option 2</string>
     <string name="option_three">Test option 3</string>
@@ -69,6 +69,13 @@
     <string name="handle_control">Перейти к управлению устройством</string>
     <string name="check_state_usb">Проверить соединение с двигателями</string>
     <string name="mode_observer">Перейти в режим "наблюдателя"</string>
+    <string name="dialog_send_datd">Для включения/отключения режима "управление устройством" измените состояние переключатель</string>
     <string name="purpose">Программый комплекс управления и мониторинга беспилотным устройством</string>
+    <string name="handle">Управление</string>
+    <string name="close_dismiss">Для закрытия окна, коснитесь экрана в любом месте</string>
+    <string name="handle_left">Для движения в левую сторону, наклоните устройство влево </string>
+    <string name="handle_forward">Для движения вперед, потяните устройство на себя </string>
+    <string name="handle_right">Для движения в правую сторону, наклоните устройство вправо</string>
+    <string name="handle_backward">Для движения назад, наклоните устройство от себя</string>
 
 </resources>

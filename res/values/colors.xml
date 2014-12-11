@@ -25,6 +25,7 @@
     <color name="horizon_ground_from">#FF5F9EA0</color>
     <color name="horizon_ground_to">#FF00008B</color>
     <color name="text_color">#FFFF</color>
+    <color name="black_transparent">#A6000000</color>
     <color name="path_color">#FF9800</color>
 
 </resources>
