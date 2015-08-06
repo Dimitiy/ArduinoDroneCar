@@ -19,23 +19,28 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.widget.Toast;
 
+import com.android.util.AppConstants;
 import com.android.util.Logging;
 
 public class SocketService extends Service {
 	private String address = "0.0.0.0";
-	static Socket socket;
+	static Socket socket = null;
 	private static Context mContext;
 	private final static String TAG = SocketService.class.getSimpleName();
-	private SharedPreferences sPref;
-	private static DataOutputStream out;
-	private DataInputStream in;
-	private static JsonBuilder jsonBuilder;
+	private SharedPreferences sPref = null;
+	private static DataOutputStream out = null;
+	private DataInputStream in = null;
 	private static boolean isConnect = false;
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 		Logging.doLog(TAG, "I am in on start", "I am in on start");
 		// Toast.makeText(this,"Service created ...", Toast.LENGTH_LONG).show();
+		if (AppConstants.isApplication == false) {
+			this.stopSelf();
+			return 0;
+		}
 		mContext = getApplicationContext();
 		ConnectSocket connect = new ConnectSocket();
 		connect.execute();
@@ -95,11 +100,6 @@ public class SocketService extends Service {
 			in = new DataInputStream(sin);
 			out = new DataOutputStream(sout);
 
-			// // Создаем поток для чтения с клавиатуры.
-			// BufferedReader keyboard = new BufferedReader(new
-			// InputStreamReader(
-			// System.in));
-			String line = null;
 			ResponseParser respParse = new ResponseParser();
 
 			Logging.doLog(
@@ -108,30 +108,18 @@ public class SocketService extends Service {
 					"Type in something and press enter. Will send it to the server and tell ya what it thinks.");
 
 			while (true) {
-				line = in.readUTF(); // ждем пока сервер отошлет строку текста.
-				respParse.Parser(String.valueOf(line));
-				if (respParse.getType().equals("1"))
-
-					// if (connectMB.getStateConnectUSB())
-					// connectMB.sendDataToMotionBase(String.valueOf(line));
-					// else
-					// Logging.doLog(TAG, "error statusConnectUSB",
-					// "error statusConnectUSB");
-					Logging.doLog("ConnectServ",
-							"The server was very polite. It sent me this : "
-									+ line,
-							"The server was very polite. It sent me this : "
-									+ line);
-				Logging.doLog(
-						"ConnectServ",
-						"Looks like the server is pleased with us. Go ahead and enter more lines.",
-						"Looks like the server is pleased with us. Go ahead and enter more lines.");
-				// line = keyboard.readLine(); // ждем пока пользователь введет
-				// // что-то и нажмет кнопку Enter.
-				System.out.println("Sending this line to the server...");
-				out.writeUTF(line); // отсылаем введенную строку текста серверу.
-				out.flush(); // заставляем поток закончить передачу данных.
-
+				// ждем пока сервер отошлет строку текста.
+				respParse.parser(String.valueOf(in.readUTF()));
+//				if (respParse.getType() == 1)
+//
+//					Logging.doLog("ConnectServ",
+//							"The server was very polite. It sent me this : "
+//									+ line,
+//							"The server was very polite. It sent me this : "
+//									+ line);
+//				out.writeUTF(line); // отсылаем введенную строку текста серверу.
+//				out.flush(); // заставляем поток закончить передачу данных.
+//
 			}
 		} catch (Exception x) {
 
@@ -140,33 +128,30 @@ public class SocketService extends Service {
 				public void run() {
 					Toast.makeText(
 							mContext,
-							"Ошибка подключения к серверу! Проверьте в настройках IP-адрес ПУ! ",
+							"Ошибка соединения с сервером! ",
 							Toast.LENGTH_LONG).show();
 				}
 			});
 			x.printStackTrace();
 		}
 	}
-	
-	public static void sendToServerComand(String line) {
+
+	static void sendToServerComand(String line) {
 		try {
-			String commandType = "1";
-			jsonBuilder = new JsonBuilder(mContext);
-			line = jsonBuilder.buildComandRequest(line, commandType);
 			if (out != null || socket != null) {
-				Logging.doLog(TAG, "out != null || socket != null");
-				
 				out.writeUTF(line); // отсылаем клиенту конфигурацию
 				out.flush(); // заставляем поток закончить передачу
 								// данных.System.out.println("Waiting for the next line...");
 								// status = in.readUTF(); // ожидаем пока клиент
 								// пришлет строку
 				if (String.valueOf(line).equals("END")) {
-					closeConnect();
+					if (socket != null) {
+						socket.close();
+						setConnect(false);
+
+					}
 				}
-				Logging.doLog(TAG, "this line : " + line, "this line : " + line);
-				Logging.doLog(TAG, "I'm sending it back...",
-						"I'm sending it back...");
+				
 
 			}
 		} catch (IOException e) {
@@ -176,17 +161,8 @@ public class SocketService extends Service {
 	}
 
 	public static void closeConnect() {
-		try {
-			if (socket != null) {
-				socket.close();
-				setConnect(false);
-				
-			} else
-				Logging.doLog(TAG, "nullSocket", "nullSocket");
-		} catch (IOException e) {
-			// TODO Автоматически созданный блок catch
-			e.printStackTrace();
-		}
+		sendToServerComand(AppConstants.END_CONNECTIONS);
+
 	}
 
 	private class ConnectSocket extends AsyncTask<String, Void, Void> {
@@ -209,12 +185,15 @@ public class SocketService extends Service {
 
 		}
 	}
-	private static void setConnect(boolean setConnect){
+
+	private static void setConnect(boolean setConnect) {
 		isConnect = setConnect;
 	}
-	public static boolean isConnect(){
+
+	public static boolean isConnect() {
 		return isConnect;
 	}
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
@@ -231,7 +210,7 @@ public class SocketService extends Service {
 		try {
 			socket.close();
 			setConnect(false);
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

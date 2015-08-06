@@ -11,33 +11,54 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.ActionBar.LayoutParams;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.util.Logging;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.shiz.arduinodronecar.connect.RequestList;
 import com.shiz.arduinodronecar.connect.SocketService;
-import com.shiz.arduinodronecar.data.MapsViewController;
+import com.shiz.arduinodronecar.data.CompassView;
+import com.shiz.arduinodronecar.data.DroneValue;
+import com.shiz.arduinodronecar.data.DroneValueListener;
 
 public class HandleDroneActivity extends ActionBarActivity implements
-		SensorEventListener, OnCheckedChangeListener {
+		SensorEventListener, OnCheckedChangeListener, InfoWindowAdapter,
+		DroneValueListener {
 	private final String TAG = HandleDroneActivity.class.getSimpleName();
 	private SensorManager mSensorManager;
+	private Sensor mAccel;
+
+	private GoogleMap map;
 	// private Sensor mAccel;
 	private android.support.v7.widget.SwitchCompat handleButton;
 
@@ -63,32 +84,18 @@ public class HandleDroneActivity extends ActionBarActivity implements
 	private String STOP_COMMAND = "0";
 	final private int DIALOG_SWITCH = 1;
 	final private int DIALOG_HANDLE = 2;
+	private DroneValue dValue;
+	public float[] aValues = new float[3];
+	public float[] mValues = new float[3];
+	private static CompassView compassView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-
 		setContentView(R.layout.handle_layout);
-		MapsViewController mMap = new MapsViewController(this);
-		mMap.init();
-
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
-
-		getSupportActionBar().setTitle("");
-		getSupportActionBar().setHomeButtonEnabled(true);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		xMax = Integer.parseInt((String) getResources().getText(
-				R.string.default_xMax));
-		xR = Integer.parseInt((String) getResources().getText(
-				R.string.default_xR));
-		yMax = Integer.parseInt((String) getResources().getText(
-				R.string.default_yMax));
-		pwmMax = Integer.parseInt((String) getResources().getText(
-				R.string.default_pwmMax));
-
+		initial();
 		createDialog(DIALOG_SWITCH);
 
 		// relativeLayout.addView(v);
@@ -168,35 +175,34 @@ public class HandleDroneActivity extends ActionBarActivity implements
 		if (xAxis < -50 && yAxis >= -220) {
 			// usbConnect.motionRight();
 			Logging.doLog(TAG, "right");
-			SocketService.sendToServerComand(RIGHT_COMMAND);
+			sendCommandToServer(RIGHT_COMMAND);
 			log = "right";
 		} else if (xAxis > 50 && yAxis >= -140) {
 			// usbConnect.motionLeft();
 			log = "left";
 			Logging.doLog(TAG, "left");
-
-			SocketService.sendToServerComand(LEFT_COMMAND);
+			sendCommandToServer(LEFT_COMMAND);
 
 		} else if (xAxis > -50 && yAxis > 140) {
 			// usbConnect.motionForward();
 			log = "forward";
 			Logging.doLog(TAG, "forward");
 
-			SocketService.sendToServerComand(FORWARD_COMMAND);
+			sendCommandToServer(FORWARD_COMMAND);
 
 		} else if (xAxis > -50 && yAxis < -27) {
 			// usbConnect.motionBackward();
 			Logging.doLog(TAG, "back");
 
 			log = "backward";
-			SocketService.sendToServerComand(BACKWARD_COMMAND);
+			sendCommandToServer(BACKWARD_COMMAND);
 
 		} else {
 			// usbConnect.stopMotion();
 			Logging.doLog(TAG, "stop");
 
 			log = "stop";
-			SocketService.sendToServerComand(STOP_COMMAND);
+			sendCommandToServer(STOP_COMMAND);
 
 		}
 
@@ -215,6 +221,30 @@ public class HandleDroneActivity extends ActionBarActivity implements
 			textX.setText("");
 			textY.setText("");
 			textCmdSend.setText("");
+		}
+
+	}
+
+	private void sendCommandToServer(String command) {
+		if (SocketService.isConnect() == false)
+			return;
+		switch (command) {
+		case "1":
+			RequestList.sendCommandRequest(FORWARD_COMMAND, this);
+			break;
+		case "2":
+			RequestList.sendCommandRequest(LEFT_COMMAND, this);
+
+			break;
+		case "3":
+			RequestList.sendCommandRequest(RIGHT_COMMAND, this);
+			break;
+		case "4":
+			RequestList.sendCommandRequest(BACKWARD_COMMAND, this);
+			break;
+		default:
+			RequestList.sendCommandRequest(STOP_COMMAND, this);
+			break;
 		}
 
 	}
@@ -244,36 +274,106 @@ public class HandleDroneActivity extends ActionBarActivity implements
 		wlp.gravity = Gravity.CENTER;
 		wlp.flags &= ~WindowManager.LayoutParams.FLAG_BLUR_BEHIND;
 		window.setAttributes(wlp);
-		dialog.getWindow().setLayout(LayoutParams.FILL_PARENT,
+		dialog.getWindow().setLayout(LayoutParams.MATCH_PARENT,
 				LayoutParams.MATCH_PARENT);
 		dialog.show();
+	}
+
+	private void initial() {
+		LayoutInflater ltInflater = getLayoutInflater();
+
+		map = ((SupportMapFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.map)).getMap();
+		if (map == null) {
+			Toast.makeText(getApplicationContext(),
+					"Sorry! unable to create maps", Toast.LENGTH_SHORT).show();
+		}
+		(findViewById(R.id.map))
+				.getViewTreeObserver()
+				.addOnGlobalLayoutListener(
+						new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+
+							@Override
+							public void onGlobalLayout() {
+								if (android.os.Build.VERSION.SDK_INT >= 16) {
+									(findViewById(R.id.map))
+											.getViewTreeObserver()
+											.removeOnGlobalLayoutListener(this);
+								} else {
+									(findViewById(R.id.map))
+											.getViewTreeObserver()
+											.removeGlobalOnLayoutListener(this);
+								}
+
+							}
+						});
+		map.setPadding(0, 250, 0, 0);
+		map.setMyLocationEnabled(true);
+		map.getUiSettings().setCompassEnabled(true);
+		map.getUiSettings().setMyLocationButtonEnabled(true);
+		map.setTrafficEnabled(true);
+		map.getUiSettings().setRotateGesturesEnabled(false);
+		map.getUiSettings().setTiltGesturesEnabled(true);
+		map.getUiSettings().setZoomControlsEnabled(true);
+		map.setIndoorEnabled(true);
+		map.setBuildingsEnabled(false);
+
+		Location location = map.getMyLocation();
+		if (location != null) {
+			map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+					location.getLatitude(), location.getLongitude()), 3));
+
+		}
+		map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+		LinearLayout linLayout = (LinearLayout) findViewById(R.id.layout_compass);
+		View view = ltInflater
+				.inflate(R.layout.layout_compass, linLayout, true);
+
+		compassView = (CompassView) view.findViewById(R.id.compassView);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+
+		getSupportActionBar().setTitle("");
+		getSupportActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		xMax = Integer.parseInt((String) getResources().getText(
+				R.string.default_xMax));
+		xR = Integer.parseInt((String) getResources().getText(
+				R.string.default_xR));
+		yMax = Integer.parseInt((String) getResources().getText(
+				R.string.default_yMax));
+		pwmMax = Integer.parseInt((String) getResources().getText(
+				R.string.default_pwmMax));
+
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		doUnbindService();
+		if (dValue != null)
+			dValue.delListener(this);
+		if (mSensorManager != null)
+			mSensorManager.unregisterListener(this);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		// startService(new Intent(HandleDroneActivity.this,
-		// SocketService.class));
+
+		dValue = new DroneValue();
+		dValue.addListener(this);
 		doBindService();
 		invalidateOptionsMenu(); // If you are using activity
-		// mAccel = mSensorManager
-		// .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		//
-		// mSensorManager.registerListener(this, mAccel,
-		// SensorManager.SENSOR_DELAY_NORMAL);
+
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (mSensorManager != null)
-			mSensorManager.unregisterListener(this);
+
 	}
 
 	@Override
@@ -307,17 +407,125 @@ public class HandleDroneActivity extends ActionBarActivity implements
 		// TODO Auto-generated method stub
 		if (isChecked == true) {
 			Logging.doLog(TAG, "isChecked try", "isChecked try");
+			mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+			mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+			mSensorManager.registerListener(HandleDroneActivity.this, mAccel,
+					SensorManager.SENSOR_DELAY_GAME);
 
-			// mSensorManager = (SensorManager)
-			// getSystemService(Context.SENSOR_SERVICE);
-			// mAccel =
-			// mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-			// mSensorManager.registerListener(HandleDroneActivity.this, mAccel,
-			// SensorManager.SENSOR_DELAY_NORMAL);
 		} else {
 			Logging.doLog(TAG, "isChecked false", "isChecked false");
 			mSensorManager.unregisterListener(HandleDroneActivity.this);
 		}
 	}
 
+	@Override
+	public View getInfoContents(Marker arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public View getInfoWindow(Marker arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void refreshDisplay(final float[] values) {
+		Logging.doLog(TAG, String.valueOf(values[0] + values[1] + values[2]),
+				String.valueOf(values[0] + values[1] + values[2]));
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+
+				if (compassView != null) {
+					compassView.setBearing(values[0]);
+					compassView.setPitch(values[1]);
+					compassView.setRoll(-values[2]);
+					compassView.invalidate();
+				}
+			}
+		});
+
+	}
+
+	@Override
+	public void onLocationChanged(final Location location) {
+		// TODO Auto-generated method stub
+		Logging.doLog(TAG, "onLocationChanged", "onLocationChanged");
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				CameraPosition cameraPosition = new CameraPosition.Builder()
+						.target(new LatLng(location.getLatitude(), location
+								.getLongitude())).zoom(16).build();
+				map.animateCamera(CameraUpdateFactory
+						.newCameraPosition(cameraPosition));
+				MarkerOptions marker = new MarkerOptions().position(
+						new LatLng(location.getLatitude(), location
+								.getLongitude())).title("ар ");
+
+				// adding marker
+				map.addMarker(marker);
+			}
+		});
+
+	}
+
+	@Override
+	public void onOrientationChanged(float[] aValues, float[] mValues) {
+		// TODO Auto-generated method stub
+		Logging.doLog(TAG, "refreshDisplay", "refreshDisplay");
+		this.aValues = aValues;
+		this.mValues = mValues;
+		refreshDisplay(calculateOrientation());
+	}
+
+	private float[] calculateOrientation() {
+		float[] values = new float[3];
+		float[] R = new float[9];
+		float[] outR = new float[9];
+		int axisX = 0, axisY = 0;
+		WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+		Display display = window.getDefaultDisplay();
+		int mScreenRotation = display.getRotation();
+		SensorManager.getRotationMatrix(R, null, aValues, mValues);
+		switch (mScreenRotation) {
+		case Surface.ROTATION_0:
+			axisX = SensorManager.AXIS_MINUS_X;
+			axisY = SensorManager.AXIS_MINUS_Y;
+			
+			break;
+
+		case Surface.ROTATION_90:
+			axisX = SensorManager.AXIS_MINUS_Z;
+			axisY = SensorManager.AXIS_X;
+			
+			break;
+
+		case Surface.ROTATION_180:
+			axisX = SensorManager.AXIS_X;
+			axisY = SensorManager.AXIS_Z;
+			break;
+
+		case Surface.ROTATION_270:
+		axisX = SensorManager.AXIS_Z;
+			axisY = SensorManager.AXIS_MINUS_X;
+		
+			break;
+
+		default:
+			break;
+		}
+		SensorManager.remapCoordinateSystem(R, axisX, axisY, outR);
+
+		SensorManager.getOrientation(outR, values);
+
+		// Convert from Radians to Degrees.
+		values[0] = (float) Math.toDegrees(values[0]);
+		values[1] = (float) Math.toDegrees(values[1]);
+		values[2] = (float) Math.toDegrees(values[2]);
+
+		return values;
+	}
 }

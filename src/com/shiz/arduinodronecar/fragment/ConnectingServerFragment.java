@@ -80,7 +80,7 @@ public class ConnectingServerFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.usb_layout, container, false);
+		View view = inflater.inflate(R.layout.fragment_connect, container, false);
 
 		toggleConnectContropPoint = (ToggleButton) view
 				.findViewById(R.id.toggleConnectControlPoint);

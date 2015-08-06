@@ -102,6 +102,7 @@ public class SensorFragment extends Fragment {
 		case Surface.ROTATION_180:
 			axisX = SensorManager.AXIS_MINUS_X;
 			axisY = SensorManager.AXIS_MINUS_Y;
+			
 			break;
 
 		case Surface.ROTATION_270:

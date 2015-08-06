@@ -1,19 +1,24 @@
 package com.shiz.arduinodronecar.connect;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.location.Location;
+
 import com.android.util.Logging;
-import com.shiz.arduinodronecar.data.MapsViewController;
+import com.shiz.arduinodronecar.data.DroneValue;
 
 public class ResponseParser {
-	String device, type, data;
+	String device = "", data = "";
+	int type;
 	private String TAG = ResponseParser.class.getSimpleName();
+	private String time;
 
-	public void Parser(String response) {
-		Logging.doLog(TAG, "response " + response, "response " + response);
-
+	public void parser(String response) throws JSONException {
+		JSONArray jsonArrayData;
 		JSONObject jsonObject;
+		DroneValue drValue = new DroneValue();
 		try {
 			jsonObject = new JSONObject(response);
 		} catch (JSONException e) {
@@ -31,57 +36,101 @@ public class ResponseParser {
 		if (str != null) {
 			setDevice(str);
 		} else {
-			setDevice(null);
+			setDevice("");
 		}
-		// ----------type data------------
+
+		// ----------get time event------------
+
 		try {
-			str = jsonObject.getString("type");
+			str = jsonObject.getString("time");
 		} catch (JSONException e) {
 			str = null;
 		}
 		if (str != null) {
-			setType(str);
+			setTime(str);
 		} else {
-			setType(null);
-
+			setTime("");
 		}
+
 		// ----------data------------
-		try {
-			str = jsonObject.getString("data");
-		} catch (JSONException e) {
-			str = null;
-		}
-		if (str != null) {
-			setData(str);
+		jsonArrayData = jsonObject.getJSONArray("data");
+		for (int i = 0; i < jsonArrayData.length(); ++i) {
+			jsonObject = jsonArrayData.getJSONObject(i);
+			try {
+				type = jsonObject.getInt("type");
+			} catch (JSONException e) {
+				type = 0;
+			}
+			if (type != 0) {
+				setType(type);
+			} else {
+				setType(0);
+			}
+			switch (type) {
+			case 1:
+				str = jsonArrayData.get(2).toString();
+				break;
+			case 2:
+				str = jsonObject.getString("location");
+				String[] loc = str.split(" ");
 
-		} else {
-			setData(null);
-		}
-		// ----------location------------
-		try {
-			str = jsonObject.getString("loc");
-		} catch (JSONException e) {
-			str = null;
-		}
-		if (str != null) {
-			setLocation(str);
+				Logging.doLog(TAG, loc[0] + loc[1] + loc[2] + loc[3] + loc[4],
+						loc[0] + loc[1] + loc[2] + loc[3] + loc[4]);
+				Location location = new Location("device");
+				for (int a = 0; a < loc.length; ++a) {
+					double number = Double.parseDouble(loc[a]);
+					switch (a) {
+					case 0:
+						location.setLongitude(number);
+						break;
+					case 1:
+						location.setLatitude(number);
+						break;
+					case 2:
+						location.setAltitude(number);
+						break;
+					case 3:
+						location.setAccuracy((float) number);
+						break;
+					case 4:
+						location.setSpeed((float) number);
+						break;
+					default:
+						break;
+					}
+				}
+				drValue.setLocation(location);
 
-		} else {
-//			setLocation(null);
+				Logging.doLog(TAG,
+						location.getLatitude() + "" + location.getLongitude());
+				drValue.setLocation(location);
+				break;
+			case 3:
+				str = jsonObject.getString("orientation").replace("[", "")
+						.replace("]", "").trim();
+				String[] parts = str.split(",");
+				float[] aValues = new float[3],
+				mValues = new float[3];
+				for (int a = 0; a < parts.length; ++a) {
+					float number = Float.parseFloat(parts[a]);
+					if (a < 3)
+						aValues[a] = number;
+					else
+						mValues[a - 3] = number;
+				}
+				drValue.setOrientation(aValues, mValues);
+
+				break;
+			default:
+				break;
+			}
 		}
+
 	}
 
-	private void setLocation(String str) {
+	private void setTime(String time) {
 		// TODO Auto-generated method stub
-		LocationToServerListener lToServer = new LocationToServerListener() {
-			
-			@Override
-			public void changeLocation(Double x, Double y) {
-				// TODO Auto-generated method stub
-				
-			}
-		};
-		
+		this.time = time;
 	}
 
 	public void setDevice(String device) {
@@ -92,11 +141,11 @@ public class ResponseParser {
 		return this.device;
 	}
 
-	public void setType(String type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
-	public String getType() {
+	public int getType() {
 		return this.type;
 	}
 

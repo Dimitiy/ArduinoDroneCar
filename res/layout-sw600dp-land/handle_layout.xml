@@ -6,13 +6,11 @@
     android:background="@color/material_blue_grey_800"
     android:keepScreenOn="true" >
 
-    <ru.yandex.yandexmapkit.MapView
+    <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:apiKey="OTENyNoLbWXvXL~RbI3BGE0qTESOwyRqgRPPTPmoRX0nmQVWbnbTGnYWEm3qocJHZ7Yl73ufiNhDwLzHOj7rDD3XgQzUfW~D6VIhTPLEO1s=" >
-
-      </ru.yandex.yandexmapkit.MapView>
+        class="com.google.android.gms.maps.SupportMapFragment" />
 
     <include layout="@layout/toolbar_transparent" />
 
@@ -21,40 +19,35 @@
         android:layout_height="250dp"
         android:layout_marginTop="?attr/actionBarSize"
         android:orientation="horizontal" >
-
-        <com.shiz.arduinodronecar.data.CompassView
-            android:id="@+id/compassView"
-            android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:layout_margin="3dp" />
-
     </LinearLayout>
 
     <RelativeLayout
-        android:layout_width="165dp"
-        android:layout_height="42dp"
-        android:layout_gravity="bottom" >
+        android:id="@+id/text_handle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:paddingBottom="30dp" >
 
-       <TextView
+        <TextView
             android:id="@+id/textViewCmdSend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentStart="true" />
 
         <TextView
             android:id="@+id/textViewY"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/textViewCmdSend"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentStart="true" />
 
         <TextView
             android:id="@+id/textViewX"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/textViewY"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentStart="true" />
     </RelativeLayout>
 
 </FrameLayout>

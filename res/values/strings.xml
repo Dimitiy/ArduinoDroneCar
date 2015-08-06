@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">DroneCar</string>
+    <string name="app_name">ClientSoftware</string>
 
     <string-array name="screen_array">
         <item>Поиск устройства</item>

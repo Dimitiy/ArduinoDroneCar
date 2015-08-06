@@ -21,6 +21,7 @@ public class Logging {
 	 */
 	public static void doLog(String tag, String inLogCat) {
 		Log.d(tag, inLogCat);
+		
 	}
 
 	/**

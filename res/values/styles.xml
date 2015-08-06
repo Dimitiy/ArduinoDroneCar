@@ -2,8 +2,7 @@
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.   -->
     <style name="Theme.MyAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
 
         <!--
@@ -22,7 +21,7 @@
     </style>
 
     <style name="MyTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:textColor">#000</item>
+        <item name="android:textColor">#fff</item>
     </style>
 
     <style name="TextAppearance">

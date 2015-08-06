@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.util.AppConstants;
 import com.shiz.arduinodronecar.connect.SocketService;
 import com.shiz.arduinodronecar.fragment.LocationFragment;
 import com.shiz.arduinodronecar.fragment.SearchDroneFragment;
@@ -59,6 +60,7 @@ public class MainActivity extends ActionBarActivity implements
 		setContentView(R.layout.activity_main);
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+		AppConstants.isApplication = true;
 		sPref = getSharedPreferences(MY_SETTINGS, MODE_PRIVATE);
 
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
@@ -69,6 +71,12 @@ public class MainActivity extends ActionBarActivity implements
 
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		AppConstants.isApplication = true;
 	}
 
 	@Override
@@ -158,9 +166,10 @@ public class MainActivity extends ActionBarActivity implements
 		} else {
 			SocketService.closeConnect();
 			stopService(new Intent(this, SocketService.class));
+			AppConstants.isApplication = false;
 
 			super.onBackPressed();
-			
+
 		}
 	}
 
@@ -283,6 +292,5 @@ public class MainActivity extends ActionBarActivity implements
 
 		return super.onOptionsItemSelected(item);
 	}
-
 
 }
